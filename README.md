@@ -1,4 +1,4 @@
-bold text# Resident Call Schedule Optimizer: System Guide
+**Resident Call Schedule Optimizer: System Guide**
 
 This system automates the generation of resident call schedules using Constraint Programming (OR-Tools). It integrates data from individual Google Sheets, applies residency-specific blackout rules, validates the feasibility of requests, and produces a fair, optimized calendar.
 
