@@ -35,7 +35,3 @@ Validation Report	Console	Real-time warnings about staffing shortages or rule vi
 Optimized Schedule	.csv	The raw data of who is assigned to every single day of the year.
 Visual Calendar	.xlsx	A multi-sheet Excel file with monthly calendar views and color-coded shifts.
 Fairness Audit	Console/Excel	A detailed breakdown of total shifts, weekend counts, and penalty scores per resident.
-Example Fairness Metrics
-Resident          Total  Weekdays  Weekends  Holidays  Penalty Score
-Adolfo_Ocampo     25     18        6         1         6
-Anouk_Ackerman    25     17        8         0         7
