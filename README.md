@@ -1,37 +1,60 @@
-**Resident Call Schedule Optimizer: System Guide**
+# Resident Call Schedule Optimizer
 
-This system automates the generation of resident call schedules using Constraint Programming (OR-Tools). It integrates data from individual Google Sheets, applies residency-specific blackout rules, validates the feasibility of requests, and produces a fair, optimized calendar.
+An automated system for generating optimized, fair, and rule-compliant resident call schedules using Google OR-Tools.
 
-1. Input Requirements
-Google Drive Setup
-Create a dedicated folder in Google Drive.
-Place one Google Sheet per resident inside this folder.
-Copy the Folder ID (the long string at the end of the folder's URL) and paste it into the Input Settings cell below.
-Sheet Formatting
-Each resident's spreadsheet must have a header row with the following exact column names (case-insensitive):
+## Overview
 
-Date: The requested day off (e.g., 2026-07-04).
-Type of Request: Must contain keywords like vacation or blackout.
-Priority (Optional): High or Low (defaults to Low).
-2. Core Logic & Functions
-Blackout Rule Engine
-The system automatically adds "Rule-Based Blackouts" to protect resident wellness:
+This codebase manages the complex logic required for medical residency scheduling. It fetches individual availability from Google Sheets, applies custom wellness rules, validates staffing density, and uses a constraint satisfaction solver to balance the workload across the team.
 
-Whole Week Rule: If a resident requests Monday through Friday off, the system automatically blackouts both surrounding weekends (Saturday/Sunday).
-Sandwich Rule: If a resident takes Thursday/Friday off and the following Monday/Tuesday off, the system automatically blackouts the intervening weekend to ensure a continuous break.
-Validation Suite
-Before running the optimizer, the Schedule Validation cell checks for:
+## Input Requirements
 
-High Density: Days where too many people are off simultaneously.
-Consecutive Weekdays: Ensuring no one takes 3+ same-weekdays (e.g., 3 Mondays) off in a row.
-Restricted Periods: Flags requests during mandatory training weeks or exam days (PRITE).
-Optimization Engine
-The solver uses a Minimax Objective. It doesn't just look for a valid schedule; it specifically tries to minimize the "Penalty Score" of the person with the hardest schedule, ensuring that shifts, weekends, and holidays are distributed as evenly as possible.
+### Google Drive Structure
+1. **Root Folder**: Create a folder in Google Drive and note its **Folder ID** (found in the URL).
+2. **Resident Sheets**: Each resident must have a separate Google Sheet inside that folder. The file name should be the resident's name (e.g., `John_Doe`).
 
-3. Output Products
-Product	Format	Description
-Compiled Requests	.csv	A master list of every resident's original and rule-based requests.
-Validation Report	Console	Real-time warnings about staffing shortages or rule violations.
-Optimized Schedule	.csv	The raw data of who is assigned to every single day of the year.
-Visual Calendar	.xlsx	A multi-sheet Excel file with monthly calendar views and color-coded shifts.
-Fairness Audit	Console/Excel	A detailed breakdown of total shifts, weekend counts, and penalty scores per resident.
+### Formatting the Sheets
+Each spreadsheet requires a header row with these exact columns:
+
+| Column | Description | Example |
+| :--- | :--- | :--- |
+| **Date** | The requested day off | `2026-07-04` |
+| **Type of Request** | Must include 'vacation' or 'blackout' | `Vacation` |
+| **Priority** | Importance of request (Optional) | `High` or `Low` |
+
+---
+
+## ⚖️ Core Rules and Logic
+
+### 1. Automatic Blackout Rules
+To prevent isolated shifts and ensure recovery time, the system applies:
+*   **Whole Week Rule**: If Mon–Fri are requested as vacation, the system automatically blackouts the weekends on both sides.
+*   **Sandwich Rule**: If a resident is off on Thu/Fri and the following Mon/Tue, the intervening weekend is automatically marked as a blackout.
+
+### 2. Validation Suite
+Before optimization, the system runs a safety check to flag:
+*   **Staffing Shortages**: Days where too many residents are unavailable.
+*   **Consecutive Weekdays**: Residents requesting the same weekday (e.g., every Monday) off too many times in a row.
+*   **Restricted Periods**: Requests during exams (PRITE), retreats, or orientation weeks.
+
+### 3. Optimization Logic
+The solver aims for a **Minimax** balance, meaning it works to make the "hardest" schedule as easy as possible. It weights variables in this order of priority:
+1.  **Hard Constraints**: No shifts on blackouts, no back-to-back shifts.
+2.  **Holiday Equity**: Ensuring everyone works a similar number of major holidays.
+3.  **Weekend Equity**: Balancing total weekend shifts.
+4.  **Shift Density**: Minimizing weeks where a resident has more than one shift.
+
+---
+
+## 📊 Final Output Products
+
+| File | Type | Description |
+| :--- | :--- | :--- |
+| `Compiled_Resident_Requests.csv` | **Data** | Master list of all raw and rule-based requests. |
+| `Final_Optimized_Schedule.csv` | **Schedule** | The raw output of the solver (Date, Assigned Resident). |
+| `Call_Schedule_Visual_Calendar.xlsx` | **Report** | A formatted Excel workbook with color-coded monthly tabs and a fairness audit. |
+
+### Example Fairness Audit Output
+```text
+Resident          Total Shifts  Weekends  Holidays  Penalty Score
+Resident1         25            6         1         6
+Resident2         25            8         0         7
