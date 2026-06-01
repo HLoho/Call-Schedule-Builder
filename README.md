@@ -4,7 +4,7 @@ An automated system for generating optimized, fair, and rule-compliant resident 
 
 ## Overview
 
-This codebase manages the complex logic required for medical residency scheduling. It fetches individual availability from Google Sheets, applies custom wellness rules, validates staffing density, and uses a constraint satisfaction solver to balance the workload across the team.
+This codebase manages the complex logic required for medical residency scheduling. It fetches individual availability from Google Sheets, applies custom wellness rules, validates staffing density, and uses a constraint satisfaction solver to balance the workload across the team. This was created with Google Gemini and run in the Google Co-lab IDE. I've provided the main script in both notebook and regular python versions. I've also provided the fake test data used to create and optimize the model. To re-create this, open the .pynib file in google colab, upload the test files to a google drive folder, then paste the drive url into the script where it requests the drive url. 
 
 ## Input Requirements
 
@@ -58,3 +58,4 @@ The solver aims for a **Minimax** balance, meaning it works to make the "hardest
 Resident          Total Shifts  Weekends  Holidays  Penalty Score
 Resident1         25            6         1         6
 Resident2         25            8         0         7
+```
